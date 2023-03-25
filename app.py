@@ -29,12 +29,15 @@ class Funcs:
         with self._conn as conn:
             conn.execute(sql)
         self._disconnect()
-
-    def _add_client(self):
+    
+    def _get_entry(self):
         self._codigo = self._entry_codigo.get()
         self._nome = self._entry_nome.get()
         self._telefone = self._entry_telefone.get()
         self._cidade = self._entry_cidade.get()
+        
+    def _add_client(self):
+        self._get_entry()
         sql ='''
             INSERT INTO tb_clientes (nome, telefone, cidade)
             VALUES (?, ?, ?)
@@ -55,6 +58,33 @@ class Funcs:
         self._disconnect()
         for row in rows:
             self._treeview.insert('', 'end', values=row)
+    
+    def _on_doble_click(self, event):
+        self._clear_screen()
+        print(self._treeview.selection())
+        print(event)
+        
+        for n in self._treeview.selection():
+            col1, col2, col3, col4 = self._treeview.item(n, 'values')
+            self._entry_codigo.insert('end',col1)
+            self._entry_nome.insert('end',col2)
+            self._entry_telefone.insert('end',col3)
+            self._entry_cidade.insert('end',col4)
+    
+    def _delete_client(self):
+        self._get_entry()
+        sql ='''
+            DELETE FROM tb_clientes WHERE
+            codigo = ?
+        '''
+        values = (self._codigo,)
+        self._connect()
+        with self._conn as conn:
+            conn.execute(sql, values); print(f'Cliente com codigo = {self._codigo} foi deletado')
+        self._disconnect()
+        self._clear_screen()
+        self._select_treeview()
+    
 class App(Funcs):
     def __init__(self, root) -> None:
         self._root = root
@@ -114,12 +144,17 @@ class App(Funcs):
         
         # Criação do botão apagar
         self._bt_apagar = Button(self._frame_1, text='Apagar', border=2, background=self._colors['blue'],
-                                foreground=self._colors['white'], font=self._font_1)
+                                foreground=self._colors['white'], font=self._font_1, command=self._delete_client)
         self._bt_apagar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
         
         #Criação da label codigo
-        self._lb_codigo = Label(self._frame_1, text='Código', border=2, background=self._colors['gray'],
-                                foreground=self._colors['blue'])
+        self._lb_codigo = Label(
+                                    self._frame_1,
+                                    text='Código',
+                                    border=2,
+                                    background=self._colors['gray'],
+                                    foreground=self._colors['blue']
+                                )
         self._lb_codigo.place(relx=0.05, rely=0.05)
         
         #Criação da entrada codigo
@@ -172,6 +207,7 @@ class App(Funcs):
         self._scroolbar = ttk.Scrollbar(self._frame_2, orient='vertical')
         self._treeview.configure(yscrollcommand=self._scroolbar.set)
         self._scroolbar.place(relx=0.96, rely=0.01, relwidth=0.04, relheight=0.85)
+        self._treeview.bind('<Double-1>', self._on_doble_click)
         
 
 if __name__ == '__main__':
