@@ -40,7 +40,7 @@ class Funcs:
         self._get_entry()
         sql ='''
             INSERT INTO tb_clientes (nome, telefone, cidade)
-            VALUES (?, ?, ?)
+            VALUES (?, ?, ?);
         '''
         values = (self._nome, self._telefone, self._cidade)
         self._connect()
@@ -53,7 +53,7 @@ class Funcs:
     def _select_treeview(self):
         self._treeview.delete(*self._treeview.get_children())
         self._connect()
-        sql = 'SELECT codigo, nome, telefone, cidade FROM tb_clientes ORDER BY nome ASC'
+        sql = 'SELECT codigo, nome, telefone, cidade FROM tb_clientes ORDER BY nome ASC;'
         rows = self._conn.execute(sql).fetchall()
         self._disconnect()
         for row in rows:
@@ -75,7 +75,7 @@ class Funcs:
         self._get_entry()
         sql ='''
             DELETE FROM tb_clientes WHERE
-            codigo = ?
+            codigo = ?;
         '''
         values = (self._codigo,)
         self._connect()
@@ -84,7 +84,22 @@ class Funcs:
         self._disconnect()
         self._clear_screen()
         self._select_treeview()
-    
+
+    def _update_client(self):
+        self._get_entry()
+        sql ='''
+            UPDATE tb_clientes SET nome = ?, telefone = ?, cidade = ?
+            WHERE codigo = ?;
+        '''
+        values = (self._nome, self._telefone, self._cidade, self._codigo)
+        self._connect()
+        with self._conn as conn:
+            conn.execute(sql, values)
+        self._disconnect()
+        self._clear_screen()
+        self._select_treeview()
+        
+   
 class App(Funcs):
     def __init__(self, root) -> None:
         self._root = root
@@ -139,7 +154,7 @@ class App(Funcs):
         
         # Criação do botão alterar
         self._bt_alterar = Button(self._frame_1, text='Alterar', border=2, background=self._colors['blue'],
-                                foreground=self._colors['white'], font=self._font_1)
+                                foreground=self._colors['white'], font=self._font_1, command=self._update_client)
         self._bt_alterar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
         
         # Criação do botão apagar
