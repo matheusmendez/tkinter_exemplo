@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "tkinter-exemplo"
+version = "0.1.0"
+description = ""
+authors = ["MatheusMendez <51379040+MatheusMendez@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "tkinter_exemplo"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+reportlab = "^3.6.12"
+pillow = "^9.4.0"
+
+
+[tool.poetry.group.dev.dependencies]
+blue = "^0.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
